@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Central de Operações Logísticas" },
+      { name: "description", content: "Portal da equipe de Logística" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Central de Operações Logísticas" },
+      { property: "og:description", content: "Portal da equipe de Logística" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Central de Operações Logísticas" },
+      { name: "twitter:description", content: "Portal da equipe de Logística" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0eacb9cd-1353-42b4-9a8f-c62567b734ac/id-preview-c83af032--6900df9f-7fae-41fd-b572-3164a1b89420.lovable.app-1783453890335.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0eacb9cd-1353-42b4-9a8f-c62567b734ac/id-preview-c83af032--6900df9f-7fae-41fd-b572-3164a1b89420.lovable.app-1783453890335.png" },
     ],
     links: [
       {

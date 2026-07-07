@@ -17,13 +17,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Dashboard corporativo da equipe de Logística: acessos rápidos às ferramentas diárias de fretes, cotações e transportadores.",
+          "Portal da equipe de Logística",
       },
       { property: "og:title", content: "Central de Operações Logísticas" },
       {
         property: "og:description",
         content:
-          "Centralize os acessos às ferramentas da equipe de Logística em um só lugar.",
+          "Portal da equipe de Logística",
       },
       { property: "og:type", content: "website" },
     ],
