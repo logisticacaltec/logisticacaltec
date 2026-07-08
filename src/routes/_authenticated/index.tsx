@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 type Accent = "green" | "orange" | "navy";
-type IconKey = "truck" | "sheet" | "shield" | "clock" | "link" | "package";
+type IconKey = "truck" | "sheet" | "shield" | "clock" | "link" | "package" | "eye" | "map" | "store" | "receipt" | "clipboard";
 
 interface Tool {
   id: string;
@@ -60,6 +60,11 @@ const ICONS: Record<IconKey, React.ComponentType<{ className?: string }>> = {
   clock: Clock,
   link: LinkIcon,
   package: Package,
+  eye: Eye,
+  map: MapIcon,
+  store: Store,
+  receipt: Receipt,
+  clipboard: ClipboardList,
 };
 
 const DEFAULT_TOOLS: Tool[] = [
@@ -101,6 +106,46 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Acesso ao ERP TOTVS Linha Datasul (rede interna Caltec).",
     href: "http://192.168.1.241:8080/totvs-login/loginForm",
     logo: totvsLogo.url,
+    accent: "navy",
+  },
+  {
+    id: "ojo",
+    title: "OJO",
+    description: "Plataforma OJO para gestão e monitoramento de operações.",
+    href: "https://plataforma.ojo.com.br/painel/#!/contratante",
+    iconKey: "eye",
+    accent: "navy",
+  },
+  {
+    id: "qualp",
+    title: "QUALP",
+    description: "Cálculo de rotas, pedágios e distâncias para o transporte.",
+    href: "https://qualp.com.br/#/",
+    iconKey: "map",
+    accent: "green",
+  },
+  {
+    id: "fretebras",
+    title: "Fretebras",
+    description: "Central de fretes Fretebras para publicação e negociação de cargas.",
+    href: "https://novacentral.fretebras.com.br/#/",
+    iconKey: "store",
+    accent: "orange",
+  },
+  {
+    id: "efrete",
+    title: "eFrete",
+    description: "Sistema eFrete para gestão de fretes com transportadoras.",
+    href: "https://sistema.efrete.com.br/Transportadoras/Fretes",
+    iconKey: "receipt",
+    accent: "green",
+  },
+  {
+    id: "pre-embarques",
+    title: "Relatórios Pré-Embarques",
+    description: "Relatórios de pré-embarques (rede interna Caltec).",
+    href: "http://192.168.1.234:8590/Relatorios/PreEmbarques",
+    iconKey: "clipboard",
     accent: "navy",
   },
 ];
