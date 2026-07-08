@@ -17,6 +17,11 @@ import {
   ArrowDown,
   Trash2,
   X,
+  Eye,
+  Map,
+  Store,
+  Receipt,
+  ClipboardList,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
