@@ -18,7 +18,7 @@ import {
   Trash2,
   X,
   Eye,
-  Map,
+  Map as MapIcon,
   Store,
   Receipt,
   ClipboardList,
