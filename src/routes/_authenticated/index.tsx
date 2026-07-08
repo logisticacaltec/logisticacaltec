@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Search,
@@ -8,9 +8,11 @@ import {
   Plus,
   ExternalLink,
   Package,
+  LogOut,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Central de Operações Logísticas" },
@@ -66,6 +68,7 @@ const tools: Tool[] = [
 
 function Dashboard() {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   const filtered = tools.filter(
     (t) =>
@@ -92,11 +95,24 @@ function Dashboard() {
                 </p>
               </div>
             </div>
-            <div className="hidden text-right sm:block">
-              <p className="text-xs uppercase tracking-widest text-white/60">
-                Equipe
-              </p>
-              <p className="text-sm font-medium">Logística</p>
+            <div className="flex items-center gap-3">
+              <div className="hidden text-right sm:block">
+                <p className="text-xs uppercase tracking-widest text-white/60">
+                  Equipe
+                </p>
+                <p className="text-sm font-medium">Logística</p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate({ to: "/auth" });
+                }}
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-white ring-1 ring-white/20 transition-colors hover:bg-white/20"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sair</span>
+              </button>
             </div>
           </div>
 
