@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -37,8 +38,9 @@ interface Tool {
   title: string;
   description: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  accent: "green" | "orange";
+  icon?: React.ComponentType<{ className?: string }>;
+  logo?: string;
+  accent: "green" | "orange" | "navy";
 }
 
 const tools: Tool[] = [
@@ -63,6 +65,13 @@ const tools: Tool[] = [
     href: "https://transportadorescaltec.lovable.app",
     icon: ShieldCheck,
     accent: "green",
+  },
+  {
+    title: "TOTVS Datasul",
+    description: "Acesso ao ERP TOTVS Linha Datasul (rede interna Caltec).",
+    href: "http://192.168.1.241:8080/totvs-login/loginForm",
+    logo: totvsLogo.url,
+    accent: "navy",
   },
 ];
 
@@ -180,11 +189,15 @@ function ToolCard({ tool }: { tool: Tool }) {
   const accentBg =
     tool.accent === "green"
       ? "bg-[oklch(0.72_0.17_150)] hover:bg-[oklch(0.65_0.17_150)]"
-      : "bg-[oklch(0.72_0.17_50)] hover:bg-[oklch(0.65_0.17_50)]";
+      : tool.accent === "orange"
+        ? "bg-[oklch(0.72_0.17_50)] hover:bg-[oklch(0.65_0.17_50)]"
+        : "bg-[oklch(0.22_0.06_255)] hover:bg-[oklch(0.18_0.06_255)]";
   const iconBg =
     tool.accent === "green"
       ? "bg-[oklch(0.72_0.17_150)]/10 text-[oklch(0.5_0.15_150)]"
-      : "bg-[oklch(0.72_0.17_50)]/10 text-[oklch(0.55_0.17_50)]";
+      : tool.accent === "orange"
+        ? "bg-[oklch(0.72_0.17_50)]/10 text-[oklch(0.55_0.17_50)]"
+        : "bg-slate-100 text-[oklch(0.22_0.06_255)]";
 
   return (
     <a
@@ -196,9 +209,17 @@ function ToolCard({ tool }: { tool: Tool }) {
       <div>
         <div className="flex items-start justify-between">
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconBg}`}
+            className={`flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden ${iconBg}`}
           >
-            <Icon className="h-6 w-6" />
+            {tool.logo ? (
+              <img
+                src={tool.logo}
+                alt={tool.title}
+                className="h-8 w-8 object-contain"
+              />
+            ) : Icon ? (
+              <Icon className="h-6 w-6" />
+            ) : null}
           </div>
           <ExternalLink className="h-4 w-4 text-slate-300 transition-colors group-hover:text-slate-500" />
         </div>
