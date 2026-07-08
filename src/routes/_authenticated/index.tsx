@@ -142,8 +142,8 @@ const DEFAULT_TOOLS: Tool[] = [
   },
   {
     id: "pre-embarques",
-    title: "Relatórios Pré-Embarques",
-    description: "Relatórios de pré-embarques (rede interna Caltec).",
+    title: "Controle do Pátio",
+    description: "Controle do pátio e da nossa balança (rede interna Caltec).",
     href: "http://192.168.1.234:8590/Relatorios/PreEmbarques",
     iconKey: "clipboard",
     accent: "navy",
