@@ -189,6 +189,14 @@ function getFaviconUrl(href: string): string | null {
   }
 }
 
+function getInitials(title: string): string {
+  const words = title.trim().split(/\s+/).filter((w) => w.length > 1);
+  if (words.length === 0) return title.slice(0, 2).toUpperCase();
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+
 function loadState(): StoredState {
   if (typeof window === "undefined") return EMPTY_STATE;
   try {
@@ -547,19 +555,25 @@ function ToolCard({
       <div className="relative">
         <div className="flex items-start justify-between">
           <div
-            className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${accentGradient} text-white ${accentGlow} transition-transform group-hover:scale-110 group-hover:rotate-3`}
+            className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
+              showFavicon
+                ? "bg-white ring-1 ring-slate-200"
+                : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
+            } transition-transform group-hover:scale-110 group-hover:rotate-3`}
           >
             {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-9 w-9 object-contain" />
+              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
             ) : showFavicon ? (
               <img
                 src={favicon}
                 alt={tool.title}
-                className="h-8 w-8 rounded-md bg-white p-0.5 object-contain"
+                className="h-full w-full object-cover"
                 onError={() => setFaviconFailed(true)}
               />
             ) : (
-              <Icon className="h-7 w-7" />
+              <span className="text-2xl font-black tracking-tight text-white">
+                {getInitials(tool.title)}
+              </span>
             )}
           </div>
           {!editMode && (
