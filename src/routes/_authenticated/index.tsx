@@ -206,7 +206,11 @@ function faviconNeedsContain(href: string): boolean {
 
 
 function getInitials(title: string): string {
-  const words = title.trim().split(/\s+/).filter((w) => w.length > 1);
+  const stop = new Set(["de", "da", "do", "das", "dos", "e", "a", "o", "of", "the"]);
+  const words = title
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !stop.has(w.toLowerCase()));
   if (words.length === 0) return title.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
