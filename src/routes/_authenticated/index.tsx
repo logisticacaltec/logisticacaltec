@@ -95,7 +95,8 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Consulta ao sistema Caltec de dados de transportadores.",
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
-    accent: "green",
+    accent: "red",
+    badge: "star",
   },
   {
     id: "lead-time",
