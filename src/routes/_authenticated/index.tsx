@@ -22,6 +22,7 @@ import {
   Store,
   Receipt,
   ClipboardList,
+  Sparkles,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
@@ -40,7 +41,18 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 type Accent = "green" | "orange" | "navy";
-type IconKey = "truck" | "sheet" | "shield" | "clock" | "link" | "package" | "eye" | "map" | "store" | "receipt" | "clipboard";
+type IconKey =
+  | "truck"
+  | "sheet"
+  | "shield"
+  | "clock"
+  | "link"
+  | "package"
+  | "eye"
+  | "map"
+  | "store"
+  | "receipt"
+  | "clipboard";
 
 interface Tool {
   id: string;
@@ -70,23 +82,15 @@ const ICONS: Record<IconKey, React.ComponentType<{ className?: string }>> = {
 const DEFAULT_TOOLS: Tool[] = [
   {
     id: "tabela-fretes",
-    title: "Tabela de Fretes",
+    title: "Painel de Fretes",
     description: "Consulta de tabelas e cálculo de fretes operacionais.",
     href: "https://tabeladefretes.lovable.app/",
     iconKey: "truck",
     accent: "green",
   },
   {
-    id: "cotacao-frete",
-    title: "Planilha de Cotação de Frete",
-    description: "Acesso direto à planilha oficial de cotações e simulações.",
-    href: "https://docs.google.com/spreadsheets/d/1kq3rg1h2jV3lmGWpX-qKfLJkrhf6eAU19iZ1-nHHzeA/edit?usp=sharing",
-    iconKey: "sheet",
-    accent: "orange",
-  },
-  {
     id: "transportadores",
-    title: "Dados de Transportadores",
+    title: "Painel de Transportadores",
     description: "Consulta ao sistema Caltec de dados de transportadores.",
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
@@ -150,27 +154,49 @@ const DEFAULT_TOOLS: Tool[] = [
   },
 ];
 
-const STORAGE_KEY = "logistica_tools_v1";
+const STORAGE_KEY = "logistica_tools_v2";
 
-interface StoredState {
-  order: string[]; // ordered list of tool ids
-  custom: Tool[]; // user-added tools
-  hidden: string[]; // hidden default ids
+interface ToolOverride {
+  title?: string;
+  description?: string;
 }
 
+interface StoredState {
+  order: string[];
+  custom: Tool[];
+  hidden: string[];
+  overrides: Record<string, ToolOverride>;
+}
+
+const EMPTY_STATE: StoredState = { order: [], custom: [], hidden: [], overrides: {} };
+
 function loadState(): StoredState {
-  if (typeof window === "undefined") return { order: [], custom: [], hidden: [] };
+  if (typeof window === "undefined") return EMPTY_STATE;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { order: [], custom: [], hidden: [] };
+    if (!raw) {
+      // migrate from v1 if present
+      const legacy = localStorage.getItem("logistica_tools_v1");
+      if (legacy) {
+        const parsed = JSON.parse(legacy) as Partial<StoredState>;
+        return {
+          order: parsed.order ?? [],
+          custom: parsed.custom ?? [],
+          hidden: parsed.hidden ?? [],
+          overrides: {},
+        };
+      }
+      return EMPTY_STATE;
+    }
     const parsed = JSON.parse(raw) as Partial<StoredState>;
     return {
       order: parsed.order ?? [],
       custom: parsed.custom ?? [],
       hidden: parsed.hidden ?? [],
+      overrides: parsed.overrides ?? {},
     };
   } catch {
-    return { order: [], custom: [], hidden: [] };
+    return EMPTY_STATE;
   }
 }
 
@@ -183,7 +209,15 @@ function saveState(state: StoredState) {
 }
 
 function mergeTools(state: StoredState): Tool[] {
-  const all = [...DEFAULT_TOOLS, ...state.custom];
+  const all = [...DEFAULT_TOOLS, ...state.custom].map((t) => {
+    const o = state.overrides[t.id];
+    if (!o) return t;
+    return {
+      ...t,
+      title: o.title ?? t.title,
+      description: o.description ?? t.description,
+    };
+  });
   const visible = all.filter((t) => !state.hidden.includes(t.id));
   const byId = new Map(visible.map((t) => [t.id, t]));
   const ordered: Tool[] = [];
@@ -194,16 +228,16 @@ function mergeTools(state: StoredState): Tool[] {
       byId.delete(id);
     }
   }
-  // append remaining (new defaults or custom) at the end
   for (const t of byId.values()) ordered.push(t);
   return ordered;
 }
 
 function Dashboard() {
   const [query, setQuery] = useState("");
-  const [state, setState] = useState<StoredState>({ order: [], custom: [], hidden: [] });
+  const [state, setState] = useState<StoredState>(EMPTY_STATE);
   const [editMode, setEditMode] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -234,10 +268,13 @@ function Dashboard() {
   }
 
   function removeTool(tool: Tool) {
+    if (!confirm(`Remover "${tool.title}" da tela?`)) return;
     if (tool.custom) {
       const custom = state.custom.filter((t) => t.id !== tool.id);
       const order = state.order.filter((id) => id !== tool.id);
-      persist({ ...state, custom, order });
+      const overrides = { ...state.overrides };
+      delete overrides[tool.id];
+      persist({ ...state, custom, order, overrides });
     } else {
       persist({ ...state, hidden: [...state.hidden, tool.id] });
     }
@@ -251,40 +288,77 @@ function Dashboard() {
     persist({ ...state, custom, order });
   }
 
+  function saveEdit(tool: Tool, title: string, description: string) {
+    if (tool.custom) {
+      const custom = state.custom.map((t) =>
+        t.id === tool.id ? { ...t, title, description } : t,
+      );
+      persist({ ...state, custom });
+    } else {
+      const overrides = {
+        ...state.overrides,
+        [tool.id]: { title, description },
+      };
+      persist({ ...state, overrides });
+    }
+    setEditingTool(null);
+  }
+
   function resetAll() {
-    persist({ order: [], custom: [], hidden: [] });
+    if (!confirm("Restaurar layout padrão? Suas alterações serão perdidas.")) return;
+    persist(EMPTY_STATE);
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="bg-[oklch(0.22_0.06_255)] text-white shadow-lg">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      {/* Decorative background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[oklch(0.72_0.17_150)]/10 blur-3xl" />
+        <div className="absolute top-1/3 -left-40 h-96 w-96 rounded-full bg-[oklch(0.72_0.17_50)]/10 blur-3xl" />
+      </div>
+
+      <header className="relative overflow-hidden bg-gradient-to-br from-[oklch(0.22_0.06_255)] via-[oklch(0.25_0.08_260)] to-[oklch(0.18_0.05_250)] text-white shadow-2xl">
+        {/* Grid pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="absolute -top-24 right-1/3 h-64 w-64 rounded-full bg-[oklch(0.72_0.17_150)]/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-1/4 h-64 w-64 rounded-full bg-[oklch(0.72_0.17_50)]/20 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                <Package className="h-6 w-6" />
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white/20 to-white/5 ring-1 ring-white/30 backdrop-blur-sm">
+                <Package className="h-7 w-7" />
               </div>
               <div className="min-w-0">
-                <h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">
-                  Central de Operações Logísticas
+                <div className="mb-1 flex items-center gap-2">
+                  <Sparkles className="h-3.5 w-3.5 text-[oklch(0.85_0.15_150)]" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">
+                    Caltec · Logística
+                  </span>
+                </div>
+                <h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
+                  Central de Operações
                 </h1>
-                <p className="text-xs text-white/70 sm:text-sm">
-                  Portal interno da equipe de Logística
+                <p className="text-xs text-white/60 sm:text-sm">
+                  Todas as ferramentas do time em um só lugar
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="hidden text-right sm:block">
-                <p className="text-xs uppercase tracking-widest text-white/60">Equipe</p>
-                <p className="text-sm font-medium">Logística</p>
-              </div>
               <button
                 type="button"
                 onClick={async () => {
                   await supabase.auth.signOut();
                   navigate({ to: "/auth" });
                 }}
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-white ring-1 ring-white/20 transition-colors hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-medium text-white ring-1 ring-white/20 backdrop-blur-sm transition-all hover:bg-white/20 hover:ring-white/40"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Sair</span>
@@ -292,31 +366,38 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="relative mt-6">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <div className="relative mt-8">
+            <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar ferramenta ou documento..."
-              className="w-full rounded-xl border-0 bg-white py-3.5 pl-12 pr-4 text-sm text-slate-900 shadow-md ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)]"
+              placeholder="Buscar ferramenta..."
+              className="w-full rounded-2xl border-0 bg-white py-4 pl-14 pr-4 text-sm text-slate-900 shadow-2xl ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)]"
             />
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-end justify-between gap-3">
+      <main className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 sm:text-xl">Acessos Rápidos</h2>
-            <p className="text-sm text-slate-500">Ferramentas essenciais do dia a dia</p>
+            <div className="mb-1 flex items-center gap-2">
+              <div className="h-1 w-8 rounded-full bg-gradient-to-r from-[oklch(0.72_0.17_150)] to-[oklch(0.72_0.17_50)]" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                Acessos Rápidos
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Ferramentas do dia a dia
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowAdd(true)}
               title="Adicionar nova ferramenta"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:shadow-md hover:ring-slate-300"
             >
               <Plus className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Adicionar</span>
@@ -324,11 +405,11 @@ function Dashboard() {
             <button
               type="button"
               onClick={() => setEditMode((v) => !v)}
-              title={editMode ? "Concluir edição" : "Reordenar ferramentas"}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium ring-1 transition-colors ${
+              title={editMode ? "Concluir edição" : "Editar ferramentas"}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold shadow-sm transition-all ${
                 editMode
-                  ? "bg-[oklch(0.72_0.17_150)] text-white ring-transparent hover:bg-[oklch(0.65_0.17_150)]"
-                  : "bg-white text-slate-600 ring-slate-200 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-gradient-to-br from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)] text-white hover:shadow-md"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:shadow-md hover:ring-slate-300"
               }`}
             >
               {editMode ? <Check className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
@@ -338,14 +419,15 @@ function Dashboard() {
         </div>
 
         {editMode && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-blue-50 px-4 py-2.5 text-xs text-blue-900 ring-1 ring-blue-100">
-            <span>
-              Use as setas para reordenar. Remova ferramentas com o ícone de lixeira.
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-3 text-xs text-blue-900 backdrop-blur-sm">
+            <span className="flex items-center gap-2">
+              <Pencil className="h-3.5 w-3.5" />
+              Use as setas para reordenar · Ícone de lápis para renomear · Lixeira para remover
             </span>
             <button
               type="button"
               onClick={resetAll}
-              className="text-xs font-medium text-blue-700 hover:underline"
+              className="text-xs font-semibold text-blue-700 hover:underline"
             >
               Restaurar padrão
             </button>
@@ -363,16 +445,30 @@ function Dashboard() {
               onMoveUp={() => moveTool(tool.id, -1)}
               onMoveDown={() => moveTool(tool.id, 1)}
               onRemove={() => removeTool(tool)}
+              onEdit={() => setEditingTool(tool)}
             />
           ))}
         </div>
 
+        {filtered.length === 0 && (
+          <div className="rounded-2xl bg-white p-12 text-center shadow-sm ring-1 ring-slate-200">
+            <p className="text-sm text-slate-500">Nenhuma ferramenta encontrada.</p>
+          </div>
+        )}
+
         <footer className="mt-16 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} Central de Operações Logísticas · Uso interno
+          © {new Date().getFullYear()} Central de Operações Logísticas · Caltec · Uso interno
         </footer>
       </main>
 
       {showAdd && <AddToolDialog onClose={() => setShowAdd(false)} onAdd={addTool} />}
+      {editingTool && (
+        <EditToolDialog
+          tool={editingTool}
+          onClose={() => setEditingTool(null)}
+          onSave={(title, description) => saveEdit(editingTool, title, description)}
+        />
+      )}
     </div>
   );
 }
@@ -385,6 +481,7 @@ function ToolCard({
   onMoveUp,
   onMoveDown,
   onRemove,
+  onEdit,
 }: {
   tool: Tool;
   editMode: boolean;
@@ -393,48 +490,78 @@ function ToolCard({
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
+  onEdit: () => void;
 }) {
   const Icon = tool.iconKey ? ICONS[tool.iconKey] : LinkIcon;
-  const accentBg =
+
+  const accentGradient =
     tool.accent === "green"
-      ? "bg-[oklch(0.72_0.17_150)] hover:bg-[oklch(0.65_0.17_150)]"
+      ? "from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)]"
       : tool.accent === "orange"
-        ? "bg-[oklch(0.72_0.17_50)] hover:bg-[oklch(0.65_0.17_50)]"
-        : "bg-[oklch(0.22_0.06_255)] hover:bg-[oklch(0.18_0.06_255)]";
-  const iconBg =
+        ? "from-[oklch(0.75_0.17_50)] to-[oklch(0.62_0.17_45)]"
+        : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
+
+  const accentGlow =
     tool.accent === "green"
-      ? "bg-[oklch(0.72_0.17_150)]/10 text-[oklch(0.5_0.15_150)]"
+      ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_150/0.5)]"
       : tool.accent === "orange"
-        ? "bg-[oklch(0.72_0.17_50)]/10 text-[oklch(0.55_0.17_50)]"
-        : "bg-slate-100 text-[oklch(0.22_0.06_255)]";
+        ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_50/0.5)]"
+        : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
+
+  const accentRing =
+    tool.accent === "green"
+      ? "group-hover:ring-[oklch(0.72_0.17_150)]/40"
+      : tool.accent === "orange"
+        ? "group-hover:ring-[oklch(0.72_0.17_50)]/40"
+        : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
 
   const inner = (
     <>
-      <div>
+      {/* Accent stripe */}
+      <div
+        className={`absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r ${accentGradient}`}
+      />
+
+      <div className="relative">
         <div className="flex items-start justify-between">
           <div
-            className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl ${iconBg}`}
+            className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${accentGradient} text-white ${accentGlow} transition-transform group-hover:scale-110 group-hover:rotate-3`}
           >
             {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-8 w-8 object-contain" />
+              <img src={tool.logo} alt={tool.title} className="h-9 w-9 object-contain" />
             ) : (
-              <Icon className="h-6 w-6" />
+              <Icon className="h-7 w-7" />
             )}
           </div>
           {!editMode && (
-            <ExternalLink className="h-4 w-4 text-slate-300 transition-colors group-hover:text-slate-500" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
+              <ExternalLink className="h-3.5 w-3.5" />
+            </div>
           )}
         </div>
-        <h3 className="mt-4 text-base font-bold text-slate-900">{tool.title}</h3>
+        <h3 className="mt-5 text-lg font-bold tracking-tight text-slate-900">{tool.title}</h3>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{tool.description}</p>
       </div>
       {!editMode && (
-        <div className="mt-5">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors ${accentBg}`}
-          >
-            Acessar ferramenta
+        <div className="relative mt-6 flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-400 transition-colors group-hover:text-slate-700">
+            Abrir ferramenta
           </span>
+          <div
+            className={`h-8 w-8 rounded-full bg-gradient-to-br ${accentGradient} opacity-0 transition-opacity group-hover:opacity-100`}
+            style={{
+              maskImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg>\")",
+              WebkitMaskImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg>\")",
+              maskSize: "18px",
+              WebkitMaskSize: "18px",
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
+              maskPosition: "center",
+              WebkitMaskPosition: "center",
+            }}
+          />
         </div>
       )}
     </>
@@ -442,15 +569,15 @@ function ToolCard({
 
   if (editMode) {
     return (
-      <div className="group relative flex min-h-[200px] flex-col justify-between rounded-2xl bg-white p-6 shadow-sm ring-2 ring-dashed ring-slate-300">
+      <div className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-md ring-2 ring-dashed ring-slate-300">
         {inner}
-        <div className="mt-4 flex items-center justify-between">
+        <div className="relative mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
           <div className="flex gap-1">
             <button
               type="button"
               onClick={onMoveUp}
               disabled={isFirst}
-              className="rounded-md p-1.5 text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50 disabled:opacity-30"
+              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30"
               title="Mover para cima"
             >
               <ArrowUp className="h-3.5 w-3.5" />
@@ -459,20 +586,30 @@ function ToolCard({
               type="button"
               onClick={onMoveDown}
               disabled={isLast}
-              className="rounded-md p-1.5 text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50 disabled:opacity-30"
+              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30"
               title="Mover para baixo"
             >
               <ArrowDown className="h-3.5 w-3.5" />
             </button>
           </div>
-          <button
-            type="button"
-            onClick={onRemove}
-            className="inline-flex items-center gap-1 rounded-md p-1.5 text-red-600 ring-1 ring-red-100 hover:bg-red-50"
-            title={tool.custom ? "Excluir ferramenta" : "Ocultar ferramenta"}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-blue-600 ring-1 ring-blue-100 transition-colors hover:bg-blue-50"
+              title="Renomear"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-red-600 ring-1 ring-red-100 transition-colors hover:bg-red-50"
+              title={tool.custom ? "Excluir ferramenta" : "Ocultar ferramenta"}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -483,10 +620,86 @@ function ToolCard({
       href={tool.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex min-h-[200px] flex-col justify-between rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-[oklch(0.22_0.06_255)]/20"
+      className={`group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-2 ${accentRing}`}
     >
       {inner}
     </a>
+  );
+}
+
+function EditToolDialog({
+  tool,
+  onClose,
+  onSave,
+}: {
+  tool: Tool;
+  onClose: () => void;
+  onSave: (title: string, description: string) => void;
+}) {
+  const [title, setTitle] = useState(tool.title);
+  const [description, setDescription] = useState(tool.description);
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onSave(title.trim(), description.trim());
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-slate-900">Editar ferramenta</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Título *</label>
+            <input
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.22_0.06_255)]"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Descrição</label>
+            <input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.22_0.06_255)]"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="rounded-lg bg-gradient-to-br from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)] px-4 py-2 text-sm font-semibold text-white shadow-md hover:shadow-lg"
+            >
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
@@ -518,7 +731,7 @@ function AddToolDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -580,6 +793,11 @@ function AddToolDialog({
                 <option value="shield">Escudo</option>
                 <option value="clock">Relógio</option>
                 <option value="package">Pacote</option>
+                <option value="eye">Olho</option>
+                <option value="map">Mapa</option>
+                <option value="store">Loja</option>
+                <option value="receipt">Recibo</option>
+                <option value="clipboard">Prancheta</option>
               </select>
             </div>
             <div>
@@ -605,7 +823,7 @@ function AddToolDialog({
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-[oklch(0.72_0.17_150)] px-4 py-2 text-sm font-semibold text-white hover:bg-[oklch(0.65_0.17_150)]"
+              className="rounded-lg bg-gradient-to-br from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)] px-4 py-2 text-sm font-semibold text-white shadow-md hover:shadow-lg"
             >
               Adicionar
             </button>
