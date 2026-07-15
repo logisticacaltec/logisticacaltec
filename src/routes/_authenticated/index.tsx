@@ -601,9 +601,7 @@ function ToolCard({
                   onError={() => setFaviconFailed(true)}
                 />
               ) : (
-                <span className="text-2xl font-black tracking-tight text-white">
-                  {getInitials(tool.title)}
-                </span>
+                <Icon className="h-8 w-8" strokeWidth={2.2} />
               )}
             </div>
             {tool.badge === "star" && (
