@@ -23,6 +23,7 @@ import {
   Receipt,
   ClipboardList,
   Sparkles,
+  Star,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Dashboard,
 });
 
-type Accent = "green" | "orange" | "navy";
+type Accent = "green" | "orange" | "navy" | "red";
 type IconKey =
   | "truck"
   | "sheet"
@@ -62,6 +63,7 @@ interface Tool {
   iconKey?: IconKey;
   logo?: string;
   accent: Accent;
+  badge?: "star";
   custom?: boolean;
 }
 
@@ -94,7 +96,8 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Consulta ao sistema Caltec de dados de transportadores.",
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
-    accent: "green",
+    accent: "red",
+    badge: "star",
   },
   {
     id: "lead-time",
@@ -206,7 +209,11 @@ function faviconNeedsContain(href: string): boolean {
 
 
 function getInitials(title: string): string {
-  const words = title.trim().split(/\s+/).filter((w) => w.length > 1);
+  const stop = new Set(["de", "da", "do", "das", "dos", "e", "a", "o", "of", "the"]);
+  const words = title
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !stop.has(w.toLowerCase()));
   if (words.length === 0) return title.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
@@ -545,21 +552,27 @@ function ToolCard({
       ? "from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)]"
       : tool.accent === "orange"
         ? "from-[oklch(0.75_0.17_50)] to-[oklch(0.62_0.17_45)]"
-        : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
+        : tool.accent === "red"
+          ? "from-[oklch(0.65_0.22_25)] to-[oklch(0.52_0.22_20)]"
+          : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
 
   const accentGlow =
     tool.accent === "green"
       ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_150/0.5)]"
       : tool.accent === "orange"
         ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_50/0.5)]"
-        : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
+        : tool.accent === "red"
+          ? "shadow-[0_20px_40px_-15px_oklch(0.6_0.22_25/0.55)]"
+          : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
 
   const accentRing =
     tool.accent === "green"
       ? "group-hover:ring-[oklch(0.72_0.17_150)]/40"
       : tool.accent === "orange"
         ? "group-hover:ring-[oklch(0.72_0.17_50)]/40"
-        : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
+        : tool.accent === "red"
+          ? "group-hover:ring-[oklch(0.6_0.22_25)]/40"
+          : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
 
   const inner = (
     <>
@@ -570,26 +583,33 @@ function ToolCard({
 
       <div className="relative">
         <div className="flex items-start justify-between">
-          <div
-            className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
-              showFavicon
-                ? "bg-white ring-1 ring-slate-200"
-                : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
-            } transition-transform group-hover:scale-110 group-hover:rotate-3`}
-          >
-            {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
-            ) : showFavicon ? (
-              <img
-                src={favicon}
-                alt={tool.title}
-                className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
-                onError={() => setFaviconFailed(true)}
-              />
-            ) : (
-              <span className="text-2xl font-black tracking-tight text-white">
-                {getInitials(tool.title)}
-              </span>
+          <div className="relative">
+            <div
+              className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
+                showFavicon
+                  ? "bg-white ring-1 ring-slate-200"
+                  : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
+              } transition-transform group-hover:scale-110 group-hover:rotate-3`}
+            >
+              {tool.logo ? (
+                <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
+              ) : showFavicon ? (
+                <img
+                  src={favicon}
+                  alt={tool.title}
+                  className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
+                  onError={() => setFaviconFailed(true)}
+                />
+              ) : (
+                <span className="text-2xl font-black tracking-tight text-white">
+                  {getInitials(tool.title)}
+                </span>
+              )}
+            </div>
+            {tool.badge === "star" && (
+              <div className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 text-white shadow-md ring-2 ring-white">
+                <Star className="h-3.5 w-3.5 fill-white" />
+              </div>
             )}
           </div>
           {!editMode && (
