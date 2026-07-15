@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Dashboard,
 });
 
-type Accent = "green" | "orange" | "navy";
+type Accent = "green" | "orange" | "navy" | "red";
 type IconKey =
   | "truck"
   | "sheet"
