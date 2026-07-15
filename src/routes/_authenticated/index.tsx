@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
+import fretebrasLogo from "@/assets/fretebras.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
