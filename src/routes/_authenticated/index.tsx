@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
+import fretebrasLogo from "@/assets/fretebras.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -137,6 +138,7 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Central de fretes Fretebras para publicação e negociação de cargas.",
     href: "https://novacentral.fretebras.com.br/#/",
     iconKey: "store",
+    logo: fretebrasLogo.url,
     accent: "orange",
   },
   {
