@@ -170,16 +170,22 @@ interface StoredState {
 
 const EMPTY_STATE: StoredState = { order: [], custom: [], hidden: [], overrides: {} };
 
+// Hosts sem favicon útil (lovable subdomains, sistemas internos) — usar iniciais
+const FAVICON_SKIP_HOSTS = ["lovable.app", "efrete.com.br"];
+
+// Hosts que renderizam melhor com "contain" (logos horizontais como Fretebras)
+const FAVICON_CONTAIN_HOSTS = ["fretebras.com.br", "novacentral.fretebras.com.br"];
+
 function getFaviconUrl(href: string): string | null {
   try {
     const u = new URL(href);
     if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-    // Skip private/local hosts — they won't have public favicons
     const host = u.hostname;
     if (
       host === "localhost" ||
       /^\d+\.\d+\.\d+\.\d+$/.test(host) ||
-      host.endsWith(".local")
+      host.endsWith(".local") ||
+      FAVICON_SKIP_HOSTS.some((h) => host === h || host.endsWith(`.${h}`))
     ) {
       return null;
     }
@@ -188,6 +194,16 @@ function getFaviconUrl(href: string): string | null {
     return null;
   }
 }
+
+function faviconNeedsContain(href: string): boolean {
+  try {
+    const host = new URL(href).hostname;
+    return FAVICON_CONTAIN_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+  } catch {
+    return false;
+  }
+}
+
 
 function getInitials(title: string): string {
   const words = title.trim().split(/\s+/).filter((w) => w.length > 1);
