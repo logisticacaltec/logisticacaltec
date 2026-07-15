@@ -493,6 +493,9 @@ function ToolCard({
   onEdit: () => void;
 }) {
   const Icon = tool.iconKey ? ICONS[tool.iconKey] : LinkIcon;
+  const favicon = getFaviconUrl(tool.href);
+  const [faviconFailed, setFaviconFailed] = useState(false);
+  const showFavicon = !tool.logo && favicon && !faviconFailed;
 
   const accentGradient =
     tool.accent === "green"
