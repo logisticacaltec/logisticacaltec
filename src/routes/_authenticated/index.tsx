@@ -192,7 +192,7 @@ function getFaviconUrl(href: string): string | null {
     ) {
       return null;
     }
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`;
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=256`;
   } catch {
     return null;
   }
