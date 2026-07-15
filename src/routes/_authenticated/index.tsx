@@ -583,7 +583,7 @@ function ToolCard({
               <img
                 src={favicon}
                 alt={tool.title}
-                className="h-full w-full object-cover"
+                className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
                 onError={() => setFaviconFailed(true)}
               />
             ) : (
