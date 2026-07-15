@@ -549,21 +549,27 @@ function ToolCard({
       ? "from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)]"
       : tool.accent === "orange"
         ? "from-[oklch(0.75_0.17_50)] to-[oklch(0.62_0.17_45)]"
-        : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
+        : tool.accent === "red"
+          ? "from-[oklch(0.65_0.22_25)] to-[oklch(0.52_0.22_20)]"
+          : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
 
   const accentGlow =
     tool.accent === "green"
       ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_150/0.5)]"
       : tool.accent === "orange"
         ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_50/0.5)]"
-        : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
+        : tool.accent === "red"
+          ? "shadow-[0_20px_40px_-15px_oklch(0.6_0.22_25/0.55)]"
+          : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
 
   const accentRing =
     tool.accent === "green"
       ? "group-hover:ring-[oklch(0.72_0.17_150)]/40"
       : tool.accent === "orange"
         ? "group-hover:ring-[oklch(0.72_0.17_50)]/40"
-        : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
+        : tool.accent === "red"
+          ? "group-hover:ring-[oklch(0.6_0.22_25)]/40"
+          : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
 
   const inner = (
     <>
