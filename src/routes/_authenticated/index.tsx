@@ -62,6 +62,7 @@ interface Tool {
   iconKey?: IconKey;
   logo?: string;
   accent: Accent;
+  badge?: "star";
   custom?: boolean;
 }
 
