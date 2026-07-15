@@ -170,6 +170,25 @@ interface StoredState {
 
 const EMPTY_STATE: StoredState = { order: [], custom: [], hidden: [], overrides: {} };
 
+function getFaviconUrl(href: string): string | null {
+  try {
+    const u = new URL(href);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+    // Skip private/local hosts — they won't have public favicons
+    const host = u.hostname;
+    if (
+      host === "localhost" ||
+      /^\d+\.\d+\.\d+\.\d+$/.test(host) ||
+      host.endsWith(".local")
+    ) {
+      return null;
+    }
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`;
+  } catch {
+    return null;
+  }
+}
+
 function loadState(): StoredState {
   if (typeof window === "undefined") return EMPTY_STATE;
   try {
