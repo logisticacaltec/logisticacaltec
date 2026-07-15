@@ -170,6 +170,25 @@ interface StoredState {
 
 const EMPTY_STATE: StoredState = { order: [], custom: [], hidden: [], overrides: {} };
 
+function getFaviconUrl(href: string): string | null {
+  try {
+    const u = new URL(href);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+    // Skip private/local hosts — they won't have public favicons
+    const host = u.hostname;
+    if (
+      host === "localhost" ||
+      /^\d+\.\d+\.\d+\.\d+$/.test(host) ||
+      host.endsWith(".local")
+    ) {
+      return null;
+    }
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`;
+  } catch {
+    return null;
+  }
+}
+
 function loadState(): StoredState {
   if (typeof window === "undefined") return EMPTY_STATE;
   try {
@@ -493,6 +512,9 @@ function ToolCard({
   onEdit: () => void;
 }) {
   const Icon = tool.iconKey ? ICONS[tool.iconKey] : LinkIcon;
+  const favicon = getFaviconUrl(tool.href);
+  const [faviconFailed, setFaviconFailed] = useState(false);
+  const showFavicon = !tool.logo && favicon && !faviconFailed;
 
   const accentGradient =
     tool.accent === "green"
@@ -529,6 +551,13 @@ function ToolCard({
           >
             {tool.logo ? (
               <img src={tool.logo} alt={tool.title} className="h-9 w-9 object-contain" />
+            ) : showFavicon ? (
+              <img
+                src={favicon}
+                alt={tool.title}
+                className="h-8 w-8 rounded-md bg-white p-0.5 object-contain"
+                onError={() => setFaviconFailed(true)}
+              />
             ) : (
               <Icon className="h-7 w-7" />
             )}
