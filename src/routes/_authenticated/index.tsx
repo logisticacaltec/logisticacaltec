@@ -192,7 +192,7 @@ function getFaviconUrl(href: string): string | null {
     ) {
       return null;
     }
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`;
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=256`;
   } catch {
     return null;
   }
@@ -601,9 +601,7 @@ function ToolCard({
                   onError={() => setFaviconFailed(true)}
                 />
               ) : (
-                <span className="text-2xl font-black tracking-tight text-white">
-                  {getInitials(tool.title)}
-                </span>
+                <Icon className="h-8 w-8" strokeWidth={2.2} />
               )}
             </div>
             {tool.badge === "star" && (
