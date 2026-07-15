@@ -138,6 +138,7 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Central de fretes Fretebras para publicação e negociação de cargas.",
     href: "https://novacentral.fretebras.com.br/#/",
     iconKey: "store",
+    logo: fretebrasLogo.url,
     accent: "orange",
   },
   {
