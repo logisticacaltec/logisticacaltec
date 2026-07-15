@@ -583,26 +583,33 @@ function ToolCard({
 
       <div className="relative">
         <div className="flex items-start justify-between">
-          <div
-            className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
-              showFavicon
-                ? "bg-white ring-1 ring-slate-200"
-                : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
-            } transition-transform group-hover:scale-110 group-hover:rotate-3`}
-          >
-            {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
-            ) : showFavicon ? (
-              <img
-                src={favicon}
-                alt={tool.title}
-                className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
-                onError={() => setFaviconFailed(true)}
-              />
-            ) : (
-              <span className="text-2xl font-black tracking-tight text-white">
-                {getInitials(tool.title)}
-              </span>
+          <div className="relative">
+            <div
+              className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
+                showFavicon
+                  ? "bg-white ring-1 ring-slate-200"
+                  : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
+              } transition-transform group-hover:scale-110 group-hover:rotate-3`}
+            >
+              {tool.logo ? (
+                <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
+              ) : showFavicon ? (
+                <img
+                  src={favicon}
+                  alt={tool.title}
+                  className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
+                  onError={() => setFaviconFailed(true)}
+                />
+              ) : (
+                <span className="text-2xl font-black tracking-tight text-white">
+                  {getInitials(tool.title)}
+                </span>
+              )}
+            </div>
+            {tool.badge === "star" && (
+              <div className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 text-white shadow-md ring-2 ring-white">
+                <Star className="h-3.5 w-3.5 fill-white" />
+              </div>
             )}
           </div>
           {!editMode && (
