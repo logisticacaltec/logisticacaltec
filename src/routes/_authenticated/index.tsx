@@ -532,6 +532,13 @@ function ToolCard({
           >
             {tool.logo ? (
               <img src={tool.logo} alt={tool.title} className="h-9 w-9 object-contain" />
+            ) : showFavicon ? (
+              <img
+                src={favicon}
+                alt={tool.title}
+                className="h-8 w-8 rounded-md bg-white p-0.5 object-contain"
+                onError={() => setFaviconFailed(true)}
+              />
             ) : (
               <Icon className="h-7 w-7" />
             )}
