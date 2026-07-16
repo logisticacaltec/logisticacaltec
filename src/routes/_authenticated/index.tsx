@@ -670,7 +670,7 @@ function ToolCard({
 
   if (editMode) {
     return (
-      <div className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-md ring-2 ring-dashed ring-slate-300">
+      <div className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-md ring-2 ring-dashed ring-slate-300 dark:bg-slate-800 dark:ring-slate-600">
         {inner}
         <div className="relative mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
           <div className="flex gap-1">
