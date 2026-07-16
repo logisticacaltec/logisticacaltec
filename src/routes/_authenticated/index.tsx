@@ -421,6 +421,14 @@ function Dashboard() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
+                onClick={toggleDark}
+                title={dark ? "Modo claro" : "Modo escuro"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-sm transition-all hover:bg-white/20 hover:ring-white/40"
+              >
+                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
                 onClick={async () => {
                   await supabase.auth.signOut();
                   navigate({ to: "/auth" });
@@ -431,6 +439,7 @@ function Dashboard() {
                 <span className="hidden sm:inline">Sair</span>
               </button>
             </div>
+
           </div>
 
           <div className="relative mt-8">
