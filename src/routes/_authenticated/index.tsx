@@ -465,7 +465,7 @@ function Dashboard() {
                 Acessos Rápidos
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-slate-100">
               Ferramentas do dia a dia
             </h2>
           </div>
@@ -474,7 +474,7 @@ function Dashboard() {
               type="button"
               onClick={() => setShowAdd(true)}
               title="Adicionar nova ferramenta"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:shadow-md hover:ring-slate-300"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:shadow-md hover:ring-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:ring-slate-600"
             >
               <Plus className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Adicionar</span>
@@ -486,13 +486,14 @@ function Dashboard() {
               className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold shadow-sm transition-all ${
                 editMode
                   ? "bg-gradient-to-br from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)] text-white hover:shadow-md"
-                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:shadow-md hover:ring-slate-300"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:shadow-md hover:ring-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:ring-slate-600"
               }`}
             >
               {editMode ? <Check className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
               <span className="hidden sm:inline">{editMode ? "Concluir" : "Editar"}</span>
             </button>
           </div>
+
         </div>
 
         {editMode && (
