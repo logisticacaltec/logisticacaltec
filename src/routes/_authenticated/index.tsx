@@ -640,8 +640,8 @@ function ToolCard({
             </div>
           )}
         </div>
-        <h3 className="mt-5 text-lg font-bold tracking-tight text-slate-900">{tool.title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{tool.description}</p>
+        <h3 className="mt-5 text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">{tool.title}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{tool.description}</p>
       </div>
       {!editMode && (
         <div className="relative mt-6 flex items-center justify-between">
