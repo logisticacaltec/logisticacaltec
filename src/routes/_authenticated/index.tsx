@@ -449,9 +449,10 @@ function Dashboard() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar ferramenta..."
-              className="w-full rounded-2xl border-0 bg-white py-4 pl-14 pr-4 text-sm text-slate-900 shadow-2xl ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)]"
+              className="w-full rounded-2xl border-0 bg-white py-4 pl-14 pr-4 text-sm text-slate-900 shadow-2xl ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)] dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
           </div>
+
         </div>
       </header>
 
