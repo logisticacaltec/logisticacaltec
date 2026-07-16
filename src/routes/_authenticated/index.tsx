@@ -721,7 +721,7 @@ function ToolCard({
       href={tool.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-2 ${accentRing}`}
+      className={`group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-2 dark:bg-slate-800 dark:ring-slate-700/60 ${accentRing}`}
     >
       {inner}
     </a>
