@@ -99,7 +99,6 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
     accent: "red",
-    badge: "star",
   },
   {
     id: "lead-time",
