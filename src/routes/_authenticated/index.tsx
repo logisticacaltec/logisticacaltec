@@ -606,11 +606,7 @@ function ToolCard({
                 <Icon className="h-8 w-8" strokeWidth={2.2} />
               )}
             </div>
-            {tool.badge === "star" && (
-              <div className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 text-white shadow-md ring-2 ring-white">
-                <Star className="h-3.5 w-3.5 fill-white" />
-              </div>
-            )}
+
           </div>
           {!editMode && (
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
