@@ -290,11 +290,26 @@ function Dashboard() {
   const [editMode, setEditMode] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
+  const [dark, setDark] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setState(loadState());
+    const saved = localStorage.getItem("logistica_theme");
+    const prefers =
+      saved === "dark" ||
+      (saved === null && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+    setDark(prefers);
+    document.documentElement.classList.toggle("dark", prefers);
   }, []);
+
+  function toggleDark() {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("logistica_theme", next ? "dark" : "light");
+  }
+
 
   const tools = mergeTools(state);
 
