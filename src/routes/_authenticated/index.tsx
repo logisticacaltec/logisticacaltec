@@ -212,6 +212,19 @@ function faviconNeedsContain(href: string): boolean {
 }
 
 
+/**
+ * Somente os sistemas hospedados no Lovable abrem dentro da Central.
+ * Os demais (Fretebras, Qualp, TOTVS, etc.) abrem no navegador.
+ */
+function canEmbed(href: string): boolean {
+  try {
+    const host = new URL(href).hostname;
+    return host === "lovable.app" || host.endsWith(".lovable.app");
+  } catch {
+    return false;
+  }
+}
+
 function getInitials(title: string): string {
   const stop = new Set(["de", "da", "do", "das", "dos", "e", "a", "o", "of", "the"]);
   const words = title
@@ -581,6 +594,7 @@ function ToolCard({
   const favicon = getFaviconUrl(tool.href);
   const [faviconFailed, setFaviconFailed] = useState(false);
   const showFavicon = !tool.logo && favicon && !faviconFailed;
+  const embeds = canEmbed(tool.href);
 
   const accentGradient =
     tool.accent === "green"
@@ -726,9 +740,11 @@ function ToolCard({
   return (
     <a
       href={tool.href}
+      target={embeds ? undefined : "_blank"}
+      rel={embeds ? undefined : "noopener noreferrer"}
       onClick={(e) => {
-        // Abre dentro da própria Central (sem nova aba/janela).
-        // Ctrl/Cmd/meio continua funcionando como link normal.
+        // Sistemas Lovable abrem dentro da Central; os demais vão para o navegador.
+        if (!embeds) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         e.preventDefault();
         onOpen();
