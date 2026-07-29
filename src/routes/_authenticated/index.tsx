@@ -25,6 +25,8 @@ import {
   Sparkles,
   Moon,
   Sun,
+  ArrowLeft,
+  RotateCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
@@ -291,6 +293,7 @@ function Dashboard() {
   const [showAdd, setShowAdd] = useState(false);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [dark, setDark] = useState(false);
+  const [activeTool, setActiveTool] = useState<Tool | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -524,6 +527,7 @@ function Dashboard() {
               onMoveDown={() => moveTool(tool.id, 1)}
               onRemove={() => removeTool(tool)}
               onEdit={() => setEditingTool(tool)}
+              onOpen={() => setActiveTool(tool)}
             />
           ))}
         </div>
@@ -539,6 +543,7 @@ function Dashboard() {
         </footer>
       </main>
 
+      {activeTool && <ToolViewer tool={activeTool} onClose={() => setActiveTool(null)} />}
       {showAdd && <AddToolDialog onClose={() => setShowAdd(false)} onAdd={addTool} />}
       {editingTool && (
         <EditToolDialog
@@ -560,6 +565,7 @@ function ToolCard({
   onMoveDown,
   onRemove,
   onEdit,
+  onOpen,
 }: {
   tool: Tool;
   editMode: boolean;
@@ -569,6 +575,7 @@ function ToolCard({
   onMoveDown: () => void;
   onRemove: () => void;
   onEdit: () => void;
+  onOpen: () => void;
 }) {
   const Icon = tool.iconKey ? ICONS[tool.iconKey] : LinkIcon;
   const favicon = getFaviconUrl(tool.href);
