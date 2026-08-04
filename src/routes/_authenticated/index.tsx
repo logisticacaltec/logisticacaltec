@@ -427,7 +427,7 @@ function Dashboard() {
                   </span>
                 </div>
                 <h1 className="truncate text-2xl font-bold tracking-tight sm:text-3xl">
-                  Central de Operações
+                  nao esta funcionando
                 </h1>
                 <p className="text-xs text-white/60 sm:text-sm">
                   Todas as ferramentas do time em um só lugar
