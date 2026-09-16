@@ -618,7 +618,7 @@ function Dashboard() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="rounded-2xl bg-white p-12 text-center shadow-sm ring-1 ring-slate-200">
+          <div className="rounded-2xl border border-slate-200/80 bg-white/70 p-12 text-center shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50">
             <p className="text-sm text-slate-500">Nenhuma ferramenta encontrada.</p>
           </div>
         )}
