@@ -496,12 +496,16 @@ function Dashboard() {
           <div className="relative mt-8">
             <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <input
+              ref={searchRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar ferramenta..."
-              className="w-full rounded-2xl border-0 bg-white py-4 pl-14 pr-4 text-sm text-slate-900 shadow-2xl ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)] dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+              className="w-full rounded-2xl border-0 bg-white py-4 pl-14 pr-28 text-sm text-slate-900 shadow-2xl ring-1 ring-white/10 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[oklch(0.72_0.17_150)] dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
+            <kbd className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 select-none items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 sm:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-500">
+              Ctrl + K
+            </kbd>
           </div>
 
         </div>
