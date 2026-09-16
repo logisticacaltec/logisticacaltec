@@ -668,94 +668,63 @@ function ToolCard({
   const showFavicon = !tool.logo && favicon && !faviconFailed;
   const embeds = canEmbed(tool.href);
 
-  const accentGradient =
+  const accentText =
     tool.accent === "green"
-      ? "from-[oklch(0.72_0.17_150)] to-[oklch(0.6_0.17_155)]"
+      ? "text-emerald-600 dark:text-emerald-400"
       : tool.accent === "orange"
-        ? "from-[oklch(0.75_0.17_50)] to-[oklch(0.62_0.17_45)]"
+        ? "text-amber-600 dark:text-amber-400"
         : tool.accent === "red"
-          ? "from-[oklch(0.65_0.22_25)] to-[oklch(0.52_0.22_20)]"
-          : "from-[oklch(0.35_0.09_260)] to-[oklch(0.22_0.06_255)]";
+          ? "text-red-600 dark:text-red-400"
+          : "text-sky-700 dark:text-sky-400";
 
   const accentGlow =
     tool.accent === "green"
-      ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_150/0.5)]"
+      ? "hover:border-[oklch(0.72_0.17_150)]/40 hover:shadow-[0_12px_36px_-10px_oklch(0.72_0.17_150/0.35)]"
       : tool.accent === "orange"
-        ? "shadow-[0_20px_40px_-15px_oklch(0.72_0.17_50/0.5)]"
+        ? "hover:border-[oklch(0.75_0.17_50)]/40 hover:shadow-[0_12px_36px_-10px_oklch(0.75_0.17_50/0.35)]"
         : tool.accent === "red"
-          ? "shadow-[0_20px_40px_-15px_oklch(0.6_0.22_25/0.55)]"
-          : "shadow-[0_20px_40px_-15px_oklch(0.22_0.06_255/0.5)]";
-
-  const accentRing =
-    tool.accent === "green"
-      ? "group-hover:ring-[oklch(0.72_0.17_150)]/40"
-      : tool.accent === "orange"
-        ? "group-hover:ring-[oklch(0.72_0.17_50)]/40"
-        : tool.accent === "red"
-          ? "group-hover:ring-[oklch(0.6_0.22_25)]/40"
-          : "group-hover:ring-[oklch(0.22_0.06_255)]/40";
+          ? "hover:border-[oklch(0.65_0.22_25)]/40 hover:shadow-[0_12px_36px_-10px_oklch(0.65_0.22_25/0.35)]"
+          : "hover:border-[oklch(0.35_0.09_260)]/40 hover:shadow-[0_12px_36px_-10px_oklch(0.35_0.09_260/0.35)]";
 
   const inner = (
     <>
-      {/* Accent stripe */}
-      <div
-        className={`absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-gradient-to-r ${accentGradient}`}
-      />
-
       <div className="relative">
         <div className="flex items-start justify-between">
-          <div className="relative">
-            <div
-              className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl ${
-                showFavicon
-                  ? "bg-white ring-1 ring-slate-200"
-                  : `bg-gradient-to-br ${accentGradient} text-white ${accentGlow}`
-              } transition-transform group-hover:scale-110 group-hover:rotate-3`}
-            >
-              {tool.logo ? (
-                <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1" />
-              ) : showFavicon ? (
-                <img
-                  src={favicon}
-                  alt={tool.title}
-                  className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1" : "object-cover"}`}
-                  onError={() => setFaviconFailed(true)}
-                />
-              ) : (
-                <Icon className="h-8 w-8" strokeWidth={2.2} />
-              )}
-            </div>
-
+          <div
+            className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl ring-1 transition-transform duration-300 group-hover:scale-105 ${
+              tool.logo
+                ? "bg-white ring-slate-200 dark:ring-slate-300/20"
+                : "bg-slate-100/80 ring-slate-200/70 dark:bg-slate-800/60 dark:ring-slate-700/60"
+            }`}
+          >
+            {tool.logo ? (
+              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1.5" />
+            ) : showFavicon ? (
+              <img
+                src={favicon}
+                alt={tool.title}
+                className={`h-full w-full ${faviconNeedsContain(tool.href) ? "object-contain p-1.5" : "object-cover"}`}
+                onError={() => setFaviconFailed(true)}
+              />
+            ) : (
+              <Icon className={`h-7 w-7 ${accentText}`} strokeWidth={2} />
+            )}
           </div>
           {!editMode && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all group-hover:bg-slate-900 group-hover:text-white dark:bg-slate-800/60 dark:text-slate-500 dark:group-hover:bg-white dark:group-hover:text-slate-900">
               <ExternalLink className="h-3.5 w-3.5" />
             </div>
           )}
         </div>
-        <h3 className="mt-5 text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">{tool.title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{tool.description}</p>
+        <h3 className="mt-4 text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">{tool.title}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{tool.description}</p>
       </div>
       {!editMode && (
-        <div className="relative mt-6 flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-400 transition-colors group-hover:text-slate-700">
+        <div className="relative mt-5 flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-500 transition-colors group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-200">
             Abrir ferramenta
           </span>
-          <div
-            className={`h-8 w-8 rounded-full bg-gradient-to-br ${accentGradient} opacity-0 transition-opacity group-hover:opacity-100`}
-            style={{
-              maskImage:
-                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg>\")",
-              WebkitMaskImage:
-                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14M13 5l7 7-7 7'/></svg>\")",
-              maskSize: "18px",
-              WebkitMaskSize: "18px",
-              maskRepeat: "no-repeat",
-              WebkitMaskRepeat: "no-repeat",
-              maskPosition: "center",
-              WebkitMaskPosition: "center",
-            }}
-          />
+          <ArrowRight className="h-4 w-4 -translate-x-1 text-slate-400 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-slate-700 group-hover:opacity-100 dark:group-hover:text-slate-200" />
         </div>
       )}
     </>
@@ -763,15 +732,15 @@ function ToolCard({
 
   if (editMode) {
     return (
-      <div className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-md ring-2 ring-dashed ring-slate-300 dark:bg-slate-800 dark:ring-slate-600">
+      <div className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 p-6 backdrop-blur-md dark:border-slate-600 dark:bg-slate-900/50">
         {inner}
-        <div className="relative mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+        <div className="relative mt-4 flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
           <div className="flex gap-1">
             <button
               type="button"
               onClick={onMoveUp}
               disabled={isFirst}
-              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30"
+              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30 dark:text-slate-400 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               title="Mover para cima"
             >
               <ArrowUp className="h-3.5 w-3.5" />
@@ -780,7 +749,7 @@ function ToolCard({
               type="button"
               onClick={onMoveDown}
               disabled={isLast}
-              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30"
+              className="rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30 dark:text-slate-400 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               title="Mover para baixo"
             >
               <ArrowDown className="h-3.5 w-3.5" />
@@ -790,7 +759,7 @@ function ToolCard({
             <button
               type="button"
               onClick={onEdit}
-              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-blue-600 ring-1 ring-blue-100 transition-colors hover:bg-blue-50"
+              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-blue-600 ring-1 ring-blue-100 transition-colors hover:bg-blue-50 dark:text-sky-400 dark:ring-sky-500/30 dark:hover:bg-sky-500/10"
               title="Renomear"
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -798,7 +767,7 @@ function ToolCard({
             <button
               type="button"
               onClick={onRemove}
-              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-red-600 ring-1 ring-red-100 transition-colors hover:bg-red-50"
+              className="inline-flex items-center gap-1 rounded-lg p-1.5 text-red-600 ring-1 ring-red-100 transition-colors hover:bg-red-50 dark:text-red-400 dark:ring-red-500/30 dark:hover:bg-red-500/10"
               title={tool.custom ? "Excluir ferramenta" : "Ocultar ferramenta"}
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -821,7 +790,7 @@ function ToolCard({
         e.preventDefault();
         onOpen();
       }}
-      className={`group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-2 dark:bg-slate-800 dark:ring-slate-700/60 ${accentRing}`}
+      className={`group relative flex min-h-[220px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700 ${accentGlow}`}
     >
       {inner}
     </a>
