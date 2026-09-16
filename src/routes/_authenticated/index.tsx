@@ -32,6 +32,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
 import fretebrasLogo from "@/assets/fretebras.png.asset.json";
+import painelFretesLogo from "@/assets/painel-fretes.png.asset.json";
+import painelTransportadoresLogo from "@/assets/painel-transportadores.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -75,6 +77,7 @@ interface Tool {
   href: string;
   iconKey?: IconKey;
   logo?: string;
+  logoCover?: boolean;
   accent: Accent;
   category?: Category;
   badge?: "star";
@@ -102,6 +105,8 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Consulta de tabelas e cálculo de fretes operacionais.",
     href: "https://tabeladefretes.lovable.app/",
     iconKey: "truck",
+    logo: painelFretesLogo.url,
+    logoCover: true,
     accent: "green",
     category: "fretes",
   },
@@ -111,6 +116,8 @@ const DEFAULT_TOOLS: Tool[] = [
     description: "Consulta ao sistema Caltec de dados de transportadores.",
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
+    logo: painelTransportadoresLogo.url,
+    logoCover: true,
     accent: "red",
     category: "fretes",
   },
@@ -698,7 +705,11 @@ function ToolCard({
             }`}
           >
             {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1.5" />
+              <img
+                src={tool.logo}
+                alt={tool.title}
+                className={`h-full w-full ${tool.logoCover ? "object-cover" : "object-contain p-1.5"}`}
+              />
             ) : showFavicon ? (
               <img
                 src={favicon}
