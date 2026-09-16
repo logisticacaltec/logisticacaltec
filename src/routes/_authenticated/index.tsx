@@ -362,11 +362,13 @@ function Dashboard() {
 
   const tools = mergeTools(state);
 
-  const filtered = tools.filter(
-    (t) =>
-      t.title.toLowerCase().includes(query.toLowerCase()) ||
-      t.description.toLowerCase().includes(query.toLowerCase()),
-  );
+  const filtered = tools
+    .filter((t) => category === "all" || (t.category ?? "gestao") === category)
+    .filter(
+      (t) =>
+        t.title.toLowerCase().includes(query.toLowerCase()) ||
+        t.description.toLowerCase().includes(query.toLowerCase()),
+    );
 
   function persist(next: StoredState) {
     setState(next);
