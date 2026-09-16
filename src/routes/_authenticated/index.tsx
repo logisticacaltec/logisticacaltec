@@ -1058,6 +1058,18 @@ function AddToolDialog({
               className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.22_0.06_255)]"
             />
           </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-700">Categoria</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.22_0.06_255)]"
+            >
+              <option value="fretes">Fretes & Transporte</option>
+              <option value="erp">Sistemas/ERP</option>
+              <option value="gestao">Gestão</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-700">Ícone</label>
