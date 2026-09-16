@@ -32,6 +32,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
 import fretebrasLogo from "@/assets/fretebras.png.asset.json";
+import painelFretesLogo from "@/assets/painel-fretes.png.asset.json";
+import painelTransportadoresLogo from "@/assets/painel-transportadores.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
