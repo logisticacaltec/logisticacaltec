@@ -992,6 +992,7 @@ function AddToolDialog({
   const [href, setHref] = useState("");
   const [accent, setAccent] = useState<Accent>("green");
   const [iconKey, setIconKey] = useState<IconKey>("link");
+  const [category, setCategory] = useState<Category>("gestao");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -1002,6 +1003,7 @@ function AddToolDialog({
       href: href.trim(),
       accent,
       iconKey,
+      category,
     });
     onClose();
   }
