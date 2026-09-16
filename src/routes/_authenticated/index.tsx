@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Search,
   Truck,
@@ -27,6 +27,7 @@ import {
   Sun,
   ArrowLeft,
   RotateCw,
+  ArrowRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import totvsLogo from "@/assets/totvs-datasul.png.asset.json";
@@ -46,6 +47,14 @@ export const Route = createFileRoute("/_authenticated/")({
 });
 
 type Accent = "green" | "orange" | "navy" | "red";
+type Category = "fretes" | "erp" | "gestao";
+
+const CATEGORIES: { id: Category | "all"; label: string }[] = [
+  { id: "all", label: "Todos" },
+  { id: "fretes", label: "Fretes & Transporte" },
+  { id: "erp", label: "Sistemas/ERP" },
+  { id: "gestao", label: "Gestão" },
+];
 type IconKey =
   | "truck"
   | "sheet"
@@ -67,6 +76,7 @@ interface Tool {
   iconKey?: IconKey;
   logo?: string;
   accent: Accent;
+  category?: Category;
   badge?: "star";
   custom?: boolean;
 }
