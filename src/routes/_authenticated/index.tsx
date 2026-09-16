@@ -567,6 +567,39 @@ function Dashboard() {
           </div>
         )}
 
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          {CATEGORIES.map((c) => {
+            const count =
+              c.id === "all"
+                ? tools.length
+                : tools.filter((t) => (t.category ?? "gestao") === c.id).length;
+            const active = category === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCategory(c.id)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                  active
+                    ? "bg-slate-900 text-white shadow-md dark:bg-white dark:text-slate-900"
+                    : "border border-slate-200 bg-white/70 text-slate-600 backdrop-blur-md hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-200"
+                }`}
+              >
+                {c.label}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                    active
+                      ? "bg-white/20 dark:bg-slate-900/10"
+                      : "bg-slate-100 dark:bg-slate-800"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((tool, idx) => (
             <ToolCard
