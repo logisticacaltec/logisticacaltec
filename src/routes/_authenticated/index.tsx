@@ -320,6 +320,8 @@ function mergeTools(state: StoredState): Tool[] {
 
 function Dashboard() {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<Category | "all">("all");
+  const searchRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<StoredState>(EMPTY_STATE);
   const [editMode, setEditMode] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
