@@ -103,6 +103,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://tabeladefretes.lovable.app/",
     iconKey: "truck",
     accent: "green",
+    category: "fretes",
   },
   {
     id: "transportadores",
@@ -111,6 +112,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://transportadorescaltec.lovable.app",
     iconKey: "shield",
     accent: "red",
+    category: "fretes",
   },
   {
     id: "lead-time",
@@ -119,6 +121,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://leadtimecaltec.lovable.app",
     iconKey: "clock",
     accent: "orange",
+    category: "gestao",
   },
   {
     id: "totvs-datasul",
@@ -127,6 +130,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "http://192.168.1.241:8080/totvs-login/loginForm",
     logo: totvsLogo.url,
     accent: "navy",
+    category: "erp",
   },
   {
     id: "ojo",
@@ -135,6 +139,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://plataforma.ojo.com.br/painel/#!/contratante",
     iconKey: "eye",
     accent: "navy",
+    category: "fretes",
   },
   {
     id: "qualp",
@@ -143,6 +148,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://qualp.com.br/#/",
     iconKey: "map",
     accent: "green",
+    category: "fretes",
   },
   {
     id: "fretebras",
@@ -152,6 +158,7 @@ const DEFAULT_TOOLS: Tool[] = [
     iconKey: "store",
     logo: fretebrasLogo.url,
     accent: "orange",
+    category: "fretes",
   },
   {
     id: "efrete",
@@ -160,6 +167,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "https://sistema.efrete.com.br/Transportadoras/Fretes",
     iconKey: "receipt",
     accent: "green",
+    category: "fretes",
   },
   {
     id: "pre-embarques",
@@ -168,6 +176,7 @@ const DEFAULT_TOOLS: Tool[] = [
     href: "http://192.168.1.234:8590/Relatorios/PreEmbarques",
     iconKey: "clipboard",
     accent: "navy",
+    category: "gestao",
   },
 ];
 
