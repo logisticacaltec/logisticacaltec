@@ -77,6 +77,7 @@ interface Tool {
   href: string;
   iconKey?: IconKey;
   logo?: string;
+  logoCover?: boolean;
   accent: Accent;
   category?: Category;
   badge?: "star";
