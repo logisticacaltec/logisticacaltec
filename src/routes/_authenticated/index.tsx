@@ -705,7 +705,11 @@ function ToolCard({
             }`}
           >
             {tool.logo ? (
-              <img src={tool.logo} alt={tool.title} className="h-full w-full object-contain p-1.5" />
+              <img
+                src={tool.logo}
+                alt={tool.title}
+                className={`h-full w-full ${tool.logoCover ? "object-cover" : "object-contain p-1.5"}`}
+              />
             ) : showFavicon ? (
               <img
                 src={favicon}
